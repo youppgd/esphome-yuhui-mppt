@@ -1,7 +1,24 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import binary_sensor
-from esphome.const import CONF_ID
+from esphome.const import (
+    CONF_CURRENT,
+    CONF_POWER,
+    DEVICE_CLASS_BATTERY,
+    DEVICE_CLASS_CURRENT,
+    DEVICE_CLASS_EMPTY,
+    DEVICE_CLASS_POWER,
+    DEVICE_CLASS_TEMPERATURE,
+    DEVICE_CLASS_VOLTAGE,
+    ICON_EMPTY,
+    STATE_CLASS_MEASUREMENT,
+    UNIT_AMPERE,
+    UNIT_CELSIUS,
+    UNIT_EMPTY,
+    UNIT_PERCENT,
+    UNIT_VOLT,
+    UNIT_WATT,
+)
 
 from . import yuhui_mppt_ns, YuhuiMPPT, CONF_YUHUI_MPPT_ID, YUHUI_MPPT_COMPONENT_SCHEMA
 
@@ -39,19 +56,71 @@ ICON_OVERVOLTAGE_PROTECTION = "mdi:flash-alert"
 
 CONFIG_SCHEMA = YUHUI_MPPT_COMPONENT_SCHEMA.extend({
     cv.GenerateID(CONF_YUHUI_MPPT_ID): cv.use_id(YuhuiMPPT),
-    cv.Optional(CONF_CHARGING_STATUS): binary_sensor.binary_sensor_schema(icon=ICON_CHARGING_STATUS),
-    cv.Optional(CONF_EQUALIZING_CHARGE): binary_sensor.binary_sensor_schema(icon=ICON_EQUALIZING_CHARGE),
-    cv.Optional(CONF_TRACKING): binary_sensor.binary_sensor_schema(icon=ICON_TRACKING),
-    cv.Optional(CONF_FLOATING_CHARGE): binary_sensor.binary_sensor_schema(icon=ICON_FLOATING_CHARGE),
-    cv.Optional(CONF_CHARGING_CURRENT_LIMIT): binary_sensor.binary_sensor_schema(icon=ICON_CHARGING_CURRENT_LIMIT),
-    cv.Optional(CONF_CHARGING_DERATING): binary_sensor.binary_sensor_schema(icon=ICON_CHARGING_DERATING),
-    cv.Optional(CONF_REMOTE_CONTROL_DISABLE_CHARGING): binary_sensor.binary_sensor_schema(icon=ICON_REMOTE_CONTROL_DISABLE_CHARGING),
-    cv.Optional(CONF_PV_OVERVOLTAGE): binary_sensor.binary_sensor_schema(icon=ICON_PV_OVERVOLTAGE),
-    cv.Optional(CONF_CHARGING_RELAY): binary_sensor.binary_sensor_schema(icon=ICON_CHARGING_RELAY),
-    cv.Optional(CONF_LOAD_OUTPUT): binary_sensor.binary_sensor_schema(icon=ICON_LOAD_OUTPUT),
-    cv.Optional(CONF_FAN_CONTROL): binary_sensor.binary_sensor_schema(icon=ICON_FAN_CONTROL),
-    cv.Optional(CONF_OVERCHARGE_PROTECTION): binary_sensor.binary_sensor_schema(icon=ICON_OVERCHARGE_PROTECTION),
-    cv.Optional(CONF_OVERVOLTAGE_PROTECTION): binary_sensor.binary_sensor_schema(icon=ICON_OVERVOLTAGE_PROTECTION),
+    cv.Optional(CONF_CHARGING_STATUS): binary_sensor.binary_sensor_schema(
+        icon=ICON_CHARGING_STATUS,
+        device_class="DEVICE_CLASS_BATTERY_CHARGING",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_EQUALIZING_CHARGE): binary_sensor.binary_sensor_schema(
+        icon=ICON_EQUALIZING_CHARGE,
+        device_class="DEVICE_CLASS_BATTERY_CHARGING",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_TRACKING): binary_sensor.binary_sensor_schema(
+        icon=ICON_TRACKING,
+        device_class="DEVICE_CLASS_SOLAR",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_FLOATING_CHARGE): binary_sensor.binary_sensor_schema(
+        icon=ICON_FLOATING_CHARGE,
+        device_class="DEVICE_CLASS_BATTERY_CHARGING",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_CHARGING_CURRENT_LIMIT): binary_sensor.binary_sensor_schema(
+        icon=ICON_CHARGING_CURRENT_LIMIT,
+        device_class="DEVICE_CLASS_CURRENT",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_CHARGING_DERATING): binary_sensor.binary_sensor_schema(
+        icon=ICON_CHARGING_DERATING,
+        device_class="DEVICE_CLASS_CURRENT",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_REMOTE_CONTROL_DISABLE_CHARGING): binary_sensor.binary_sensor_schema(
+        icon=ICON_REMOTE_CONTROL_DISABLE_CHARGING,
+        device_class="DEVICE_CLASS_POWER",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_PV_OVERVOLTAGE): binary_sensor.binary_sensor_schema(
+        icon=ICON_PV_OVERVOLTAGE,
+        device_class="DEVICE_CLASS_VOLTAGE",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_CHARGING_RELAY): binary_sensor.binary_sensor_schema(
+        icon=ICON_CHARGING_RELAY,
+        device_class="DEVICE_CLASS_POWER",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_LOAD_OUTPUT): binary_sensor.binary_sensor_schema(
+        icon=ICON_LOAD_OUTPUT,
+        device_class="DEVICE_CLASS_POWER",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_FAN_CONTROL): binary_sensor.binary_sensor_schema(
+        icon=ICON_FAN_CONTROL,
+        device_class="DEVICE_CLASS_FAN",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_OVERCHARGE_PROTECTION): binary_sensor.binary_sensor_schema(
+        icon=ICON_OVERCHARGE_PROTECTION,
+        device_class="DEVICE_CLASS_VOLTAGE",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
+    cv.Optional(CONF_OVERVOLTAGE_PROTECTION): binary_sensor.binary_sensor_schema(
+        icon=ICON_OVERVOLTAGE_PROTECTION,
+        device_class="DEVICE_CLASS_VOLTAGE",
+        state_class="STATE_CLASS_MEASUREMENT"
+    ),
 })
 
 
