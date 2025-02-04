@@ -17,16 +17,23 @@ CONF_INTERNAL_TEMPERATURE2_STATUS = 'internal_temperature2_status'
 CONF_EXTERNAL_TEMPERATURE1_STATUS = 'external_temperature1_status'
 
 ICON_FLASH = "mdi:flash"
+ICON_BATTERY_ALERT_VARIANT = "mdi:battery-alert-variant"
+ICON_FAN = "mdi:fan"
+ICON_THERMOMETER_ALERT = "mdi:thermometer-alert"
+ICON_DC_OUTPUT = "mdi:export"
+ICON_ARERT_CIRCLE = "mdi:alert-circle"
+
+
 
 CONFIG_SCHEMA = YUHUI_MPPT_COMPONENT_SCHEMA.extend({
-    cv.Optional(CONF_RUNNING_STATUS): text_sensor.text_sensor_schema(icon=ICON_FLASH),
-    cv.Optional(CONF_BATTERY_STATUS): text_sensor.text_sensor_schema(icon=ICON_FLASH),
-    cv.Optional(CONF_FAN_STATUS): text_sensor.text_sensor_schema(icon=ICON_FLASH),
-    cv.Optional(CONF_TEMPERATURE_STATUS): text_sensor.text_sensor_schema(icon=ICON_FLASH),
-    cv.Optional(CONF_DC_OUTPUT_STATUS): text_sensor.text_sensor_schema(icon=ICON_FLASH),
-    cv.Optional(CONF_INTERNAL_TEMPERATURE1_STATUS): text_sensor.text_sensor_schema(icon=ICON_FLASH),
-    cv.Optional(CONF_INTERNAL_TEMPERATURE2_STATUS): text_sensor.text_sensor_schema(icon=ICON_FLASH),
-    cv.Optional(CONF_EXTERNAL_TEMPERATURE1_STATUS): text_sensor.text_sensor_schema(icon=ICON_FLASH),
+    cv.Optional(CONF_RUNNING_STATUS): text_sensor.text_sensor_schema(icon=ICON_ARERT_CIRCLE),
+    cv.Optional(CONF_BATTERY_STATUS): text_sensor.text_sensor_schema(icon=ICON_BATTERY_ALERT_VARIANT),
+    cv.Optional(CONF_FAN_STATUS): text_sensor.text_sensor_schema(icon=ICON_FAN),
+    cv.Optional(CONF_TEMPERATURE_STATUS): text_sensor.text_sensor_schema(icon=ICON_THERMOMETER_ALERT),
+    cv.Optional(CONF_DC_OUTPUT_STATUS): text_sensor.text_sensor_schema(icon=ICON_DC_OUTPUT),
+    cv.Optional(CONF_INTERNAL_TEMPERATURE1_STATUS): text_sensor.text_sensor_schema(icon=ICON_THERMOMETER_ALERT),
+    cv.Optional(CONF_INTERNAL_TEMPERATURE2_STATUS): text_sensor.text_sensor_schema(icon=ICON_THERMOMETER_ALERT),
+    cv.Optional(CONF_EXTERNAL_TEMPERATURE1_STATUS): text_sensor.text_sensor_schema(icon=ICON_THERMOMETER_ALERT),
 })
 
 

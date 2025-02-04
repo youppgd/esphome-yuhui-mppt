@@ -23,21 +23,35 @@ CONF_FAN_CONTROL = 'fan_control'
 CONF_OVERCHARGE_PROTECTION = 'overcharge_protection'
 CONF_OVERVOLTAGE_PROTECTION = 'overvoltage_protection'
 
+ICON_CHARGING_STATUS = "mdi:battery-charging-50"
+ICON_EQUALIZING_CHARGE = "mdi:battery-charging-100"
+ICON_TRACKING = "mdi:solar-power"
+ICON_FLOATING_CHARGE = "mdi:battery-charging-100"
+ICON_CHARGING_CURRENT_LIMIT = "mdi:arrow-down-bold-circle-outline"
+ICON_CHARGING_DERATING = "mdi:arrow-down-bold-circle-outline"
+ICON_REMOTE_CONTROL_DISABLE_CHARGING = "mdi:power-plug-off"
+ICON_PV_OVERVOLTAGE = "mdi:flash-alert"
+ICON_CHARGING_RELAY = "mdi:power-plug-battery"
+ICON_LOAD_OUTPUT = "mdi:power-plug"
+ICON_FAN_CONTROL = "mdi:fan"
+ICON_OVERCHARGE_PROTECTION = "mdi:flash-alert"
+ICON_OVERVOLTAGE_PROTECTION = "mdi:flash-alert"
+
 CONFIG_SCHEMA = YUHUI_MPPT_COMPONENT_SCHEMA.extend({
     cv.GenerateID(CONF_YUHUI_MPPT_ID): cv.use_id(YuhuiMPPT),
-    cv.Optional(CONF_CHARGING_STATUS): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_EQUALIZING_CHARGE): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_TRACKING): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_FLOATING_CHARGE): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_CHARGING_CURRENT_LIMIT): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_CHARGING_DERATING): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_REMOTE_CONTROL_DISABLE_CHARGING): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_PV_OVERVOLTAGE): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_CHARGING_RELAY): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_LOAD_OUTPUT): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_FAN_CONTROL): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_OVERCHARGE_PROTECTION): binary_sensor.binary_sensor_schema(),
-    cv.Optional(CONF_OVERVOLTAGE_PROTECTION): binary_sensor.binary_sensor_schema(),
+    cv.Optional(CONF_CHARGING_STATUS): binary_sensor.binary_sensor_schema(icon=ICON_CHARGING_STATUS),
+    cv.Optional(CONF_EQUALIZING_CHARGE): binary_sensor.binary_sensor_schema(icon=ICON_EQUALIZING_CHARGE),
+    cv.Optional(CONF_TRACKING): binary_sensor.binary_sensor_schema(icon=ICON_TRACKING),
+    cv.Optional(CONF_FLOATING_CHARGE): binary_sensor.binary_sensor_schema(icon=ICON_FLOATING_CHARGE),
+    cv.Optional(CONF_CHARGING_CURRENT_LIMIT): binary_sensor.binary_sensor_schema(icon=ICON_CHARGING_CURRENT_LIMIT),
+    cv.Optional(CONF_CHARGING_DERATING): binary_sensor.binary_sensor_schema(icon=ICON_CHARGING_DERATING),
+    cv.Optional(CONF_REMOTE_CONTROL_DISABLE_CHARGING): binary_sensor.binary_sensor_schema(icon=ICON_REMOTE_CONTROL_DISABLE_CHARGING),
+    cv.Optional(CONF_PV_OVERVOLTAGE): binary_sensor.binary_sensor_schema(icon=ICON_PV_OVERVOLTAGE),
+    cv.Optional(CONF_CHARGING_RELAY): binary_sensor.binary_sensor_schema(icon=ICON_CHARGING_RELAY),
+    cv.Optional(CONF_LOAD_OUTPUT): binary_sensor.binary_sensor_schema(icon=ICON_LOAD_OUTPUT),
+    cv.Optional(CONF_FAN_CONTROL): binary_sensor.binary_sensor_schema(icon=ICON_FAN_CONTROL),
+    cv.Optional(CONF_OVERCHARGE_PROTECTION): binary_sensor.binary_sensor_schema(icon=ICON_OVERCHARGE_PROTECTION),
+    cv.Optional(CONF_OVERVOLTAGE_PROTECTION): binary_sensor.binary_sensor_schema(icon=ICON_OVERVOLTAGE_PROTECTION),
 })
 
 
