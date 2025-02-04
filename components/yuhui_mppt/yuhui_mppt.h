@@ -7,6 +7,7 @@
 #include "esphome/components/button/button.h"
 #include "esphome/components/text_sensor/text_sensor.h"
 #include "esphome/components/switch/switch.h"
+#include <queue>
 
 namespace esphome {
 namespace yuhui {
@@ -20,6 +21,7 @@ enum YuhuiMPPTState {
 class YuhuiMPPT : public PollingComponent, public custom_modbus::ModbusDevice {
  public:
   void set_device_address(uint8_t address) { this->device_address_ = address; }
+  void set_rx_timeout(uint32_t timeout) { this->rx_timeout_ = timeout; }
 
   void setup() override;
   void loop() override;
@@ -28,6 +30,7 @@ class YuhuiMPPT : public PollingComponent, public custom_modbus::ModbusDevice {
   void send_query_command();
   void send_control_command(uint8_t control_code);
   void send_parameter_command(uint8_t parameter_code, uint32_t parameter_value, uint8_t data_length);
+  void send_clock_calibration_command();
   void on_modbus_raw_data(const std::vector<uint8_t> &data) override;
   void on_modbus_data(const std::vector<uint8_t> &data) override { this->on_modbus_raw_data(data); }
 
@@ -58,16 +61,13 @@ class YuhuiMPPT : public PollingComponent, public custom_modbus::ModbusDevice {
   void set_internal_temperature_sensor(sensor::Sensor *sensor) { internal_temperature_sensor_ = sensor; }
   void set_daily_energy_sensor(sensor::Sensor *sensor) { daily_energy_sensor_ = sensor; }
   void set_total_energy_sensor(sensor::Sensor *sensor) { total_energy_sensor_ = sensor; }
-  void set_power_sensor(sensor::Sensor *sensor) { power_sensor_ = sensor; }
+  void set_charging_power_sensor(sensor::Sensor *sensor) { charging_power_sensor_ = sensor; }
 
-  void set_allow_charging_button(button::Button *button) { allow_charging_button_ = button; }
-  void set_disable_charging_button(button::Button *button) { disable_charging_button_ = button; }
-  void set_enable_dc_output_button(button::Button *button) { enable_dc_output_button_ = button; }
-  void set_disable_dc_output_button(button::Button *button) { disable_dc_output_button_ = button; }
   void set_silence_alarm_button(button::Button *button) { silence_alarm_button_ = button; }
   void set_enable_backlight_button(button::Button *button) { enable_backlight_button_ = button; }
+  void set_clock_calibration_button(button::Button *button) { clock_calibration_button_ = button; }
 
-  void set_charge_switch(esphome::switch_::Switch *charge_switch) { charge_switch_ = charge_switch; }
+  void set_disable_charge_switch(esphome::switch_::Switch *disable_charge_switch) { disable_charge_switch_ = disable_charge_switch; }
   void set_dc_output_switch(esphome::switch_::Switch *dc_output_switch) { dc_output_switch_ = dc_output_switch; }
 
  protected:
@@ -98,16 +98,13 @@ class YuhuiMPPT : public PollingComponent, public custom_modbus::ModbusDevice {
   sensor::Sensor *internal_temperature_sensor_ = nullptr;
   sensor::Sensor *daily_energy_sensor_ = nullptr;
   sensor::Sensor *total_energy_sensor_ = nullptr;
-  sensor::Sensor *power_sensor_ = nullptr;
+  sensor::Sensor *charging_power_sensor_ = nullptr;
 
-  button::Button *allow_charging_button_ = nullptr;
-  button::Button *disable_charging_button_ = nullptr;
-  button::Button *enable_dc_output_button_ = nullptr;
-  button::Button *disable_dc_output_button_ = nullptr;
   button::Button *silence_alarm_button_ = nullptr;
   button::Button *enable_backlight_button_ = nullptr;
+  button::Button *clock_calibration_button_ = nullptr;
 
-  esphome::switch_::Switch *charge_switch_ = nullptr;
+  esphome::switch_::Switch *disable_charge_switch_ = nullptr;
   esphome::switch_::Switch *dc_output_switch_ = nullptr;
 
   int baud_rate_ = 9600;
@@ -119,9 +116,14 @@ class YuhuiMPPT : public PollingComponent, public custom_modbus::ModbusDevice {
   uint8_t buffer_[37];
   size_t buffer_index_ = 0;
   unsigned long last_receive_time_ = 0;
+  bool awaiting_response_ = false;
+  std::queue<std::vector<uint8_t>> send_queue_;
+  unsigned long last_send_time_ = 0;
+  uint32_t rx_timeout_ = 1000;  // 默认1秒超时
 
   void handle_command(uint8_t *data);
   void process_state_();
+  void process_send_queue_();
 };
 
 }  // namespace yuhui

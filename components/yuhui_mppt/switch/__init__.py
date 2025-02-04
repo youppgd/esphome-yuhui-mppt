@@ -7,14 +7,14 @@ from .. import yuhui_mppt_ns, YuhuiMPPT, CONF_YUHUI_MPPT_ID, YUHUI_MPPT_COMPONEN
 
 DEPENDENCIES = ['yuhui_mppt']
 
-CONF_CHARGE_SWITCH = 'charge_switch'
+CONF_DISABLE_CHARGE_SWITCH = 'disable_charge_switch'
 CONF_DC_OUTPUT_SWITCH = 'dc_output_switch'
 
 ICON_CHARGING = "mdi:battery-charging-50"
 ICON_DC_OUTPUT = "mdi:power-plug"
 
 TYPES = {
-    CONF_CHARGE_SWITCH: (0x01, 0x02),
+    CONF_DISABLE_CHARGE_SWITCH: (0x02, 0x01),
     CONF_DC_OUTPUT_SWITCH: (0x03, 0x04),
 }
 

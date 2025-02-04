@@ -14,7 +14,11 @@ void YuhuiMPPT::setup() {
 }
 
 void YuhuiMPPT::loop() {
-  // Modbus通信不需要在loop中处理数据接收
+  if (this->awaiting_response_ && (millis() - this->last_send_time_ > this->rx_timeout_)) {
+    ESP_LOGW(TAG, "Response timeout, sending next command");
+    this->awaiting_response_ = false;
+    this->process_send_queue_();
+  }
 }
 
 void YuhuiMPPT::update() {
@@ -34,17 +38,16 @@ void YuhuiMPPT::send_query_command() {
   std::vector<uint8_t> data = {this->device_address_, 0xB3, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
   data[7] = calculate_checksum(data.data(), 7);
 
-  this->send_raw_no_crc(data);
-  ESP_LOGD(TAG, "Sent query command 0xB3: Query real-time data with address 0x%02X", this->device_address_);
-  ESP_LOGD(TAG, "[Device 0x%02X] PV Voltage Sensor Pointer: %p", this->device_address_, this->pv_voltage_sensor_);
+  this->send_queue_.push(data);
+  this->process_send_queue_();
 }
 
 void YuhuiMPPT::send_control_command(uint8_t control_code) {
   std::vector<uint8_t> data = {this->device_address_, 0xC0, control_code, 0x00, 0x00, 0x00, 0x00, 0x00};
   data[7] = calculate_checksum(data.data(), 7);
 
-  this->send_raw_no_crc(data);
-  ESP_LOGD(TAG, "Sent control command 0xC0: Control code 0x%02X", control_code);
+  this->send_queue_.push(data);
+  this->process_send_queue_();
 }
 
 void YuhuiMPPT::send_parameter_command(uint8_t parameter_code, uint32_t parameter_value, uint8_t data_length) {
@@ -64,11 +67,46 @@ void YuhuiMPPT::send_parameter_command(uint8_t parameter_code, uint32_t paramete
 
   data[7] = calculate_checksum(data.data(), 7);
 
+  this->send_queue_.push(data);
+  this->process_send_queue_();
+}
+
+void YuhuiMPPT::send_clock_calibration_command() {
+  time_t now = time(nullptr);
+  struct tm *timeinfo = localtime(&now);
+
+  uint8_t year = (timeinfo->tm_year + 1900) % 100;
+  uint8_t month = timeinfo->tm_mon + 1;
+  uint8_t day = timeinfo->tm_mday;
+  uint8_t hour = timeinfo->tm_hour;
+  uint8_t minute = timeinfo->tm_min;
+
+  std::vector<uint8_t> data = {this->device_address_, 0xDF, year, month, day, hour, minute};
+  uint8_t checksum = calculate_checksum(data.data(), 7);
+  data.push_back(checksum);
+
+  this->send_queue_.push(data);
+  this->process_send_queue_();
+}
+
+void YuhuiMPPT::process_send_queue_() {
+  if (this->awaiting_response_ || this->send_queue_.empty()) {
+    return;
+  }
+
+  std::vector<uint8_t> data = this->send_queue_.front();
+  this->send_queue_.pop();
+
   this->send_raw_no_crc(data);
-  ESP_LOGD(TAG, "Sent parameter command 0xD0: Parameter code 0x%02X with value 0x%08X", parameter_code, parameter_value);
+  this->awaiting_response_ = true;
+  this->last_send_time_ = millis();
+  ESP_LOGD(TAG, "Sent command: %s", format_hex_pretty(&data.front(), data.size()).c_str());
 }
 
 void YuhuiMPPT::on_modbus_raw_data(const std::vector<uint8_t> &data) {
+  this->awaiting_response_ = false;
+  this->process_send_queue_();
+
   if (data.size() < 37) {
     //ESP_LOGW(TAG, "Received data size is too small, expected at least 37 bytes, got %d", data.size());
     return;
@@ -187,10 +225,10 @@ void YuhuiMPPT::on_modbus_raw_data(const std::vector<uint8_t> &data) {
       this->charging_current_limit_sensor_->publish_state(charging_current_limit);
     if (this->charging_derating_sensor_ != nullptr)
       this->charging_derating_sensor_->publish_state(charging_derating);
-    if (this->remote_control_disable_charging_sensor_ != nullptr) {
+    if (this->remote_control_disable_charging_sensor_ != nullptr) 
       this->remote_control_disable_charging_sensor_->publish_state(remote_control_disable_charging);
-      this->charge_switch_->publish_state(remote_control_disable_charging);  // 更新 charge_switch 的状态
-    }
+    if (this->disable_charge_switch_ != nullptr)
+      this->disable_charge_switch_->publish_state(remote_control_disable_charging);
     if (this->pv_overvoltage_sensor_ != nullptr)
       this->pv_overvoltage_sensor_->publish_state(pv_overvoltage);
 
@@ -210,10 +248,10 @@ void YuhuiMPPT::on_modbus_raw_data(const std::vector<uint8_t> &data) {
     // 更新控制状态传感器
     if (this->charging_relay_sensor_ != nullptr)
       this->charging_relay_sensor_->publish_state(charging_relay);
-    if (this->load_output_sensor_ != nullptr){
+    if (this->load_output_sensor_ != nullptr)
       this->load_output_sensor_->publish_state(load_output);
-      this->dc_output_switch_->publish_state(load_output);  // 更新 dc_output_switch 的状态
-    }
+    if (this->dc_output_switch_ != nullptr)
+      this->dc_output_switch_->publish_state(load_output);
     if (this->fan_control_sensor_ != nullptr)
       this->fan_control_sensor_->publish_state(fan_control);
     if (this->overcharge_protection_sensor_ != nullptr)
@@ -250,8 +288,8 @@ void YuhuiMPPT::on_modbus_raw_data(const std::vector<uint8_t> &data) {
     ESP_LOGD(TAG, "Power: %.2f W", power_value);
 
     // 更新功率传感器
-    if (this->power_sensor_ != nullptr)
-      this->power_sensor_->publish_state(power_value);
+    if (this->charging_power_sensor_ != nullptr)
+      this->charging_power_sensor_->publish_state(power_value);
 
     // 解析内部温度
     float internal_temperature_value = internal_temperature / 10.0;
