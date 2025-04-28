@@ -122,6 +122,7 @@ void YuhuiMPPT::on_modbus_raw_data(const std::vector<uint8_t> &data) {
   uint16_t battery_voltage = (data[8] << 8) | data[9];
   uint16_t charging_current = (data[10] << 8) | data[11];
   uint16_t internal_temperature = (data[12] << 8) | data[13];
+  uint16_t external_temperature = (data[16] << 8) | data[17];
   uint32_t daily_energy = (data[20] << 24) | (data[21] << 16) | (data[22] << 8) | data[23];
   uint32_t total_energy = (data[24] << 24) | (data[25] << 16) | (data[26] << 8) | data[27];
   uint8_t checksum = data[36];
@@ -298,6 +299,14 @@ void YuhuiMPPT::on_modbus_raw_data(const std::vector<uint8_t> &data) {
     // 更新内部温度传感器
     if (this->internal_temperature_sensor_ != nullptr)
       this->internal_temperature_sensor_->publish_state(internal_temperature_value);
+      
+    // 解析外部温度
+    float external_temperature_value = external_temperature / 10.0;
+    ESP_LOGD(TAG, "External temperature: %.1f °C", external_temperature_value);
+
+    // 更新外部温度传感器
+    if (this->external_temperature_sensor_ != nullptr)
+      this->external_temperature_sensor_->publish_state(external_temperature_value);
 
     // 解析日发电量
     float daily_energy_value = daily_energy / 1000.0;
