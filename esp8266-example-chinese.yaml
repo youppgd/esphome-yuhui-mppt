@@ -68,6 +68,8 @@ sensor:
       name: CCS-充电电流
     internal_temperature:
       name: ITS-内部温度
+    external_temperature:
+      name: ETS-外部温度
     daily_energy:
       name: DES-日发电量
     total_energy:
