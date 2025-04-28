@@ -59,6 +59,7 @@ class YuhuiMPPT : public PollingComponent, public custom_modbus::ModbusDevice {
   void set_battery_voltage_sensor(sensor::Sensor *sensor) { battery_voltage_sensor_ = sensor; }
   void set_charging_current_sensor(sensor::Sensor *sensor) { charging_current_sensor_ = sensor; }
   void set_internal_temperature_sensor(sensor::Sensor *sensor) { internal_temperature_sensor_ = sensor; }
+  void set_external_temperature_sensor(sensor::Sensor *sensor) { external_temperature_sensor_ = sensor; }
   void set_daily_energy_sensor(sensor::Sensor *sensor) { daily_energy_sensor_ = sensor; }
   void set_total_energy_sensor(sensor::Sensor *sensor) { total_energy_sensor_ = sensor; }
   void set_charging_power_sensor(sensor::Sensor *sensor) { charging_power_sensor_ = sensor; }
@@ -96,6 +97,7 @@ class YuhuiMPPT : public PollingComponent, public custom_modbus::ModbusDevice {
   sensor::Sensor *battery_voltage_sensor_ = nullptr;
   sensor::Sensor *charging_current_sensor_ = nullptr;
   sensor::Sensor *internal_temperature_sensor_ = nullptr;
+  sensor::Sensor *external_temperature_sensor_ = nullptr;
   sensor::Sensor *daily_energy_sensor_ = nullptr;
   sensor::Sensor *total_energy_sensor_ = nullptr;
   sensor::Sensor *charging_power_sensor_ = nullptr;
