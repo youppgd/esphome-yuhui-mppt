@@ -32,6 +32,7 @@ CONF_PV_VOLTAGE = 'pv_voltage'
 CONF_BATTERY_VOLTAGE = 'battery_voltage'
 CONF_CHARGING_CURRENT = 'charging_current'
 CONF_INTERNAL_TEMPERATURE = 'internal_temperature'
+CONF_EXTERNAL_TEMPERATURE = 'external_temperature'
 CONF_DAILY_ENERGY = 'daily_energy'
 CONF_TOTAL_ENERGY = 'total_energy'
 CONF_CHARGING_POWER = 'charging_power'
@@ -74,6 +75,13 @@ CONFIG_SCHEMA = cv.Schema({
         device_class=DEVICE_CLASS_TEMPERATURE,
         state_class=STATE_CLASS_MEASUREMENT,
     ),
+    cv.Optional(CONF_EXTERNAL_TEMPERATURE): sensor.sensor_schema(
+        unit_of_measurement=UNIT_CELSIUS,
+        icon=ICON_INTERNAL_TEMPERATURE,
+        accuracy_decimals=1,
+        device_class=DEVICE_CLASS_TEMPERATURE,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),    
     cv.Optional(CONF_DAILY_ENERGY): sensor.sensor_schema(
         unit_of_measurement=UNIT_KILOWATT_HOURS,
         icon=ICON_DAILY_ENERGY,
@@ -112,6 +120,9 @@ async def to_code(config):
     if CONF_INTERNAL_TEMPERATURE in config:
         sens = await sensor.new_sensor(config[CONF_INTERNAL_TEMPERATURE])
         cg.add(var.set_internal_temperature_sensor(sens))
+    if CONF_EXTERNAL_TEMPERATURE in config:
+        sens = await sensor.new_sensor(config[CONF_EXTERNAL_TEMPERATURE])
+        cg.add(var.set_external_temperature_sensor(sens))        
     if CONF_DAILY_ENERGY in config:
         sens = await sensor.new_sensor(config[CONF_DAILY_ENERGY])
         cg.add(var.set_daily_energy_sensor(sens))
